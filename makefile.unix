@@ -7,7 +7,8 @@ DEFINES     := -DRLGENV_NOMAINLOOP
 LDFLAGS     := 
 INCLUDES    := -Isrc/control -Isrc/os_dependent -I/usr/include 
 LIBS_SDL    := -lSDL -lSDL_gfx -lSDL_image 
-LIBS        := $(LIBS_SDL)
+LIBS_BOOST  := -lboost_thread-mt -lboost_serialization -lboost_system -lboost_filesystem
+LIBS        := $(LIBS_SDL) $(LIBS_BOOST)
 OBJS	      :=
 PROF        :=
 MODULES     :=
@@ -51,7 +52,7 @@ HAVE_NASM = 1
 
 INCLUDES += -Isrc/games -Isrc/emucore -Isrc/emucore/m6502/src -Isrc/emucore/m6502/src/bspf/src -Isrc/common -Isrc/control -Isrc/agents 
 OBJS += 
-DEFINES +=  -DUNIX -DHAS_ALTIVEC -DUSE_NASM -DBSPF_UNIX -DHAVE_INTTYPES -DWINDOWED_SUPPORT  -DHAVE_GETTIMEOFDAY -DSNAPSHOT_SUPPORT 
+DEFINES +=  -DUNIX -DHAS_ALTIVEC -DUSE_NASM -DBSPF_UNIX -DHAVE_INTTYPES -DWINDOWED_SUPPORT  -DHAVE_GETTIMEOFDAY -DSNAPSHOT_SUPPORT -D__USE_SDL
 LDFLAGS += 
 
 

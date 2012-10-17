@@ -6,6 +6,7 @@ MODULE_OBJS := \
 	src/common/display_screen.o \
 	src/common/Constants.o \
 	src/common/Defaults.o \
+	src/common/visual_processor.o \
 
 MODULE_DIRS += \
 	src/common
