@@ -65,6 +65,7 @@ OSystem::OSystem()
     p_export_screen(NULL),  //ALE
     mySound(NULL),
     p_display_screen(NULL), //ALE
+    p_vis_proc(NULL),
     mySettings(NULL),
     myPropSet(NULL),
     myConsole(NULL),
@@ -127,6 +128,9 @@ OSystem::~OSystem()
   }
   if (p_display_screen) {
       delete p_display_screen;
+  }
+  if (p_vis_proc) {
+      delete p_vis_proc;
   }
     
   //ALE  delete aiBase; 
@@ -420,6 +424,11 @@ bool OSystem::createConsole(const string& romfile)
       int screen_width = myConsole->mediaSource().width();
       int screen_height = myConsole->mediaSource().height();
       p_display_screen = new DisplayScreen(p_export_screen, screen_width, screen_height);
+  }
+
+  if (mySettings->getBool("process_screen",true)) {
+      printf("Starting Visual Processing\n");
+      p_vis_proc = new VisualProcessor(this, myRomFile);
   }
 
   return retval;
@@ -734,6 +743,8 @@ void OSystem::mainLoop()
         MediaSource& mediasrc = console().mediaSource();
         if (p_display_screen) // Display the screen if applicable
             p_display_screen->display_screen(mediasrc);
+        if (p_vis_proc) // Do visual processing if applicable
+            p_vis_proc->process_image(mediasrc, myGameController->getPreviousActionA());
         //ALE  ****************************************************/
         
         myTimingInfo.start = getTicks();

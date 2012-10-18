@@ -16,6 +16,7 @@
 #include "control/internal_controller.h"
 #include "common/Constants.h"
 #include "common/Defaults.hpp"
+#include "common/visual_processor.h"
 #include "games/RomSettings.hpp"
 #include "games/Roms.hpp"
 #include "agents/PlayerAgent.hpp"
@@ -48,6 +49,7 @@ public:
     MediaSource *mediasrc;
     System* emulator_system;
     RomSettings* game_settings;
+    VisualProcessor* visProc;
 
     int screen_width, screen_height;  // Dimensions of the screen
     IntMatrix screen_matrix;     // This contains the raw pixel representation of the screen
@@ -61,11 +63,12 @@ public:
     Action last_action;          // Always stores the latest action taken
     time_t time_start, time_end; // Used to keep track of fps
     bool display_active;         // Should the screen be displayed or not
+    bool process_screen;         // Should visual processing be performed or not
 
 public:
     ALEInterface(): theOSystem(NULL), game_controller(NULL), mediasrc(NULL), emulator_system(NULL),
                     game_settings(NULL), frame(0), max_num_frames(-1),
-                    game_score(0), display_active(false) {
+                    game_score(0), display_active(false), process_screen(false) {
     }
 
     ~ALEInterface() {
@@ -74,8 +77,9 @@ public:
     }
 
     // Loads and initializes a game. After this call the game should be ready to play.
-    bool loadROM(string rom_file, bool display_screen) {
+    bool loadROM(string rom_file, bool display_screen, bool process_screen) {
         display_active = display_screen;
+        this->process_screen = process_screen;
         int argc = 6;
         char** argv = new char*[argc];
         for (int i=0; i<=argc; i++) {
@@ -87,7 +91,10 @@ public:
         strcpy(argv[3],"-display_screen");
         if (display_screen) strcpy(argv[4],"true");
         else                strcpy(argv[4],"false");
-        strcpy(argv[5],rom_file.c_str());  
+        strcpy(argv[5],"-process_screen");
+        if (process_screen) strcpy(argv[6],"true");
+        else                strcpy(argv[6],"false");
+        strcpy(argv[7],rom_file.c_str());  
 
         cout << welcomeMessage() << endl;
     
@@ -168,6 +175,7 @@ public:
 
         emulator_system = &theOSystem->console().system();
         game_settings = buildRomRLWrapper(theOSystem->romFile());
+        visProc = theOSystem->p_vis_proc;
         legal_actions = game_settings->getAllActions();
         minimal_actions = game_settings->getMinimalActionSet();
         max_num_frames = theOSystem->settings().getInt("max_num_frames", true);
@@ -253,6 +261,10 @@ public:
         if (display_active) {
             theOSystem->p_display_screen->display_screen(screen_matrix, screen_width, screen_height);
             //theOSystem->p_display_screen->display_screen(*mediasrc);            
+        }
+
+        if (process_screen) {
+            theOSystem->p_vis_proc->process_image(*mediasrc, action);
         }
 
         game_score += action_reward;
