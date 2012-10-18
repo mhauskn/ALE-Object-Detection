@@ -80,7 +80,7 @@ public:
     bool loadROM(string rom_file, bool display_screen, bool process_screen) {
         display_active = display_screen;
         this->process_screen = process_screen;
-        int argc = 6;
+        int argc = 8;
         char** argv = new char*[argc];
         for (int i=0; i<=argc; i++) {
             argv[i] = new char[200];
