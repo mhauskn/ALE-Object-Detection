@@ -1,6 +1,7 @@
 #ifndef ALE_INTERFACE_H
 #define ALE_INTERFACE_H
 
+#include <fstream>
 #include <cstdlib>
 #include <ctime>
 #include "emucore/m6502/src/bspf/src/bspf.hxx"
@@ -64,16 +65,21 @@ public:
     time_t time_start, time_end; // Used to keep track of fps
     bool display_active;         // Should the screen be displayed or not
     bool process_screen;         // Should visual processing be performed or not
+    ofstream *trajFile;          // Trajectory file
 
 public:
     ALEInterface(): theOSystem(NULL), game_controller(NULL), mediasrc(NULL), emulator_system(NULL),
                     game_settings(NULL), frame(0), max_num_frames(-1),
-                    game_score(0), display_active(false), process_screen(false) {
+                    game_score(0), display_active(false), process_screen(false), trajFile(NULL) {
     }
 
     ~ALEInterface() {
         if (theOSystem) delete theOSystem;
         if (game_controller) delete game_controller;
+        if (trajFile != NULL) {
+            if (trajFile->is_open()) trajFile->close();
+            delete trajFile;
+        }
     }
 
     // Loads and initializes a game. After this call the game should be ready to play.
@@ -215,6 +221,12 @@ public:
 
         // Record the starting time of this game
         time_start = time(NULL);
+
+        if (trajFile != NULL) {
+            if (trajFile->is_open()) trajFile->close();
+            delete trajFile;
+        }
+        //trajFile = new ofstream("trajectory.txt", std::ofstream::out);
     }
 
     // Indicates if the game has ended
@@ -269,6 +281,9 @@ public:
         if (process_screen) {
             theOSystem->p_vis_proc->process_image(*mediasrc, action);
         }
+
+        if (trajFile != NULL && trajFile->is_open())
+            (*trajFile) << action << endl;
 
         game_score += action_reward;
         last_action = action;

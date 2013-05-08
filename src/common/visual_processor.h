@@ -14,14 +14,17 @@
 #include <deque>
 #include "Constants.h"
 #include "display_screen.h"
-#include "../games/RomSettings.hpp"
-#include "../emucore/OSystem.hxx"
-#include "../emucore/MediaSrc.hxx"
+//#include "../games/RomSettings.hpp"
+//#include "../emucore/OSystem.hxx"
+//#include "../emucore/MediaSrc.hxx"
 #include <boost/unordered_set.hpp>
 #include <boost/filesystem.hpp>
 #include <set>
 #include <map>
 
+class OSystem;
+class MediaSource;
+class RomSettings;
 
 // Search a map for a key and returns default value if not found
 template <typename K, typename V>
@@ -229,7 +232,7 @@ struct Prototype {
 };
 
 
-class VisualProcessor : public SDLEventHandler {
+class VisualProcessor { //: public SDLEventHandler {
 public:
     VisualProcessor(OSystem* _osystem, string myRomFile);
     ~VisualProcessor() {};

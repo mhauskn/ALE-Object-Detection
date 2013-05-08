@@ -15,6 +15,10 @@
 #include <sstream>
 #include <omp.h>
 #include <boost/lexical_cast.hpp>
+#include "../emucore/OSystem.hxx"
+#include "../games/RomSettings.hpp"
+#include "../emucore/MediaSrc.hxx"
+
 
 #ifdef MUNKRES
     #include "munkres.h" // Implementation of the Kuhn-Munkres algorithm
@@ -486,8 +490,8 @@ VisualProcessor::VisualProcessor(OSystem* _osystem, string myRomFile) :
     }
 
     // Register ourselves as an event handler if a screen is present
-    if (p_osystem->p_display_screen)
-        p_osystem->p_display_screen->registerEventHandler(this);
+    // if (p_osystem->p_display_screen)
+    //     p_osystem->p_display_screen->registerEventHandler(this);
 };
 
 void VisualProcessor::process_image(const MediaSource& mediaSrc, Action action) {

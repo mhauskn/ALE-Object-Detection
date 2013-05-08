@@ -33,6 +33,7 @@
   #include "CheatManager.hxx"
 #endif
 
+#include "../common/visual_processor.h" //MHAUSKN
 #include "FSNode.hxx"
 #include "unzip.h"
 #include "MD5.hxx"

@@ -39,7 +39,7 @@ class VideoDialog;
 #include "m6502/src/bspf/src/bspf.hxx"
 #include "../common/export_screen.h" //ALE
 #include "../common/display_screen.h" //MHAUSKN
-#include "../common/visual_processor.h" //MHAUSKN
+//#include "../common/visual_processor.h" //MHAUSKN
 class EventStreamer; //ALE 
 class VisualProcessor; // MHAUSKN
 
