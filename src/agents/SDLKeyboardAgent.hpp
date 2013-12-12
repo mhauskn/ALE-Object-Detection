@@ -46,9 +46,13 @@ class SDLKeyboardAgent : public PlayerAgent, SDLEventHandler {
      ******************************************************************** */
     virtual Action act();
 
+    long getL2Diff();
+
   private:
     bool returnToPause;               // This is used after manual control is released to set paused state
     bool manual_control;              // Is the game being controlled manually?
+
+    IntVect initialRam;
 };
 #else
 /** A dummy class for when SDL is not used. */

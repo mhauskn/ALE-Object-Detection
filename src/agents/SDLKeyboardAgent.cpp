@@ -16,10 +16,11 @@
 #include "SDLKeyboardAgent.hpp"
 #include "random_tools.h"
 #include <stdexcept>
+#include "game_controller.h"
 
 #ifdef __USE_SDL
 SDLKeyboardAgent::SDLKeyboardAgent(OSystem* _osystem, RomSettings* _settings) : 
-    PlayerAgent(_osystem, _settings), manual_control(false) {
+    PlayerAgent(_osystem, _settings), manual_control(true) {
   Settings& settings = p_osystem->settings();
 
   // If not displaying the screen, there is little point in having keyboard control
@@ -33,6 +34,15 @@ SDLKeyboardAgent::SDLKeyboardAgent(OSystem* _osystem, RomSettings* _settings) :
 }
 
 Action SDLKeyboardAgent::act() {
+    if (initialRam.size() == 0) {
+        GameController* controller = p_osystem->getGameController();
+        for(int i = 0; i < 128; i++) {
+            int ram_byte = controller->read_ram(i);
+            initialRam.push_back(ram_byte);
+        }
+    }
+
+    printf("Ram Diff: %ld\n",getL2Diff());
   if (manual_control) {
       return waitForKeypress();
   } 
@@ -40,6 +50,16 @@ Action SDLKeyboardAgent::act() {
     return choice(&available_actions);
 }
 
+
+long SDLKeyboardAgent::getL2Diff() {
+    long diff = 0;
+    GameController* controller = p_osystem->getGameController();
+    for(int i = 0; i < 128; i++) {
+        int ram_byte = controller->read_ram(i);
+        diff += (initialRam[i] - ram_byte) * (initialRam[i] - ram_byte);
+    }
+    return diff;
+}
 
 bool SDLKeyboardAgent::handleSDLEvent(const SDL_Event& event) {
     switch(event.type) {
