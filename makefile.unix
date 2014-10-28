@@ -4,15 +4,12 @@
 
 srcdir      ?= .
 # Set this to 1 to enable SDL and display_screen
-USE_SDL     := 0
-# Set this to 1 to enable the RLGlue interface
-USE_RLGLUE  := 0
+USE_SDL     := 1
 DEFINES     := -DRLGENV_NOMAINLOOP
-LDFLAGS     := 
-INCLUDES    := -Isrc/controllers -Isrc/os_dependent -I/usr/include -Isrc/environment 
+LDFLAGS     := -L/u/mhauskn/local/lib
+INCLUDES    := -Isrc/control -Isrc/os_dependent -I/usr/include 
 LIBS_SDL    := -lSDL -lSDL_gfx -lSDL_image 
-LIBS_RLGLUE := -lrlutils -lrlgluenetdev
-LIBS        :=
+LIBS        := -lboost_thread-mt -lboost_serialization -lboost_system -lboost_filesystem
 OBJS	    :=
 PROF        :=
 MODULES     :=
@@ -24,6 +21,8 @@ DEBUG       := 0
 CXX := g++
 CXXFLAGS := 
 LD := g++
+# LIBS += -lz -lX11
+# For the Mac
 LIBS += -lz 
 RANLIB := ranlib
 INSTALL := install
@@ -52,19 +51,14 @@ PROFILE :=
 HAVE_GCC3 = 1
 HAVE_NASM = 1
 
-INCLUDES += -Isrc/games -Isrc/emucore -Isrc/emucore/m6502/src -Isrc/emucore/m6502/src/bspf/src -Isrc/common -Isrc/controllers -Isrc/agents -Isrc/environment  
+INCLUDES += -Isrc/games -Isrc/emucore -Isrc/emucore/m6502/src -Isrc/emucore/m6502/src/bspf/src -Isrc/common -Isrc/control -Isrc/agents 
 OBJS += 
-DEFINES +=  -DUNIX -DHAS_ALTIVEC -DUSE_NASM -DBSPF_UNIX -DHAVE_INTTYPES -DWINDOWED_SUPPORT  -DHAVE_GETTIMEOFDAY -DSNAPSHOT_SUPPORT 
+DEFINES +=  -DUNIX -DHAS_ALTIVEC -DUSE_NASM -DBSPF_UNIX -DHAVE_INTTYPES -DWINDOWED_SUPPORT  -DHAVE_GETTIMEOFDAY -DSNAPSHOT_SUPPORT -D__USE_SDL
 LDFLAGS += 
 
-ifeq ($(strip $(USE_SDL)), 1)
+ifeq ("$(USE_SDL)", "1")
   DEFINES +=  -D__USE_SDL
   LIBS += $(LIBS_SDL)
-endif
-
-ifeq ($(strip $(USE_RLGLUE)), 1)
-  DEFINES +=  -D__USE_RLGLUE
-  LIBS += $(LIBS_RLGLUE)
 endif
 
 
@@ -73,7 +67,7 @@ endif
 
 CXXFLAGS += -Wall -Wno-multichar -Wunused -fno-rtti -fPIC
 
-ifeq ($(strip $(DEBUG)), 1)
+ifeq ("$(DEBUG)", "1")
   CXXFLAGS += -g -O0
 else
   CXXFLAGS += -O3
@@ -121,11 +115,10 @@ MODULES += \
 	src/emucore \
 	src/emucore/m6502 \
 	src/common \
-	src/controllers \
+	src/control \
 	src/os_dependent \
 	src/agents \
-  src/games \
-  src/environment
+  src/games
 
 
 ######################################################################
@@ -148,7 +141,7 @@ $(EXECUTABLE):  $(OBJS)
 	$(LD) $(LDFLAGS) $(PRE_OBJS_FLAGS) $+ $(POST_OBJS_FLAGS) $(LIBS) $(PROF) -o $@
 
 $(LIBRARY): $(OBJS)
-	$(LD) $(LDFLAGS) -shared -o $(LIBRARY) $(OBJS) $(LIBS)
+	$(LD) $(LDFLAGS) -shared -o $(LIBRARY) $(OBJS)        
 
 distclean: clean
 	$(RM_REC) $(DEPDIRS)
